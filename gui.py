@@ -4,6 +4,7 @@ import time
 from tkinter import BOTH, Frame, Canvas, Button, ttk, Label, TOP, LEFT
 from brute_force_sort import BruteForceSort
 from selection_sort import SelectionSort
+from bubble_sort import BubbleSort
 
 
 class GUI(Frame):
@@ -17,7 +18,7 @@ class GUI(Frame):
         self.lower_value_range = 1
         self.upper_value_range = 100
 
-        self.sort_methods = ["Brute Force", "Selection Sort", "Placeholder"]
+        self.sort_methods = ["Brute Force", "Selection Sort", "Bubble Sort"]
         self.delay = 0.005  # Seconds
         self.num_of_values = 50
         self.stop_sort = False
@@ -90,11 +91,15 @@ class GUI(Frame):
         self.data_set_copy = None
         self.build_visualizer()
 
+
     def set_sorting_algorithm(self):
         if self.sort_combo_box.get() == "Brute Force":
             self.sorting_algorithm = BruteForceSort()
         elif self.sort_combo_box.get() == "Selection Sort":
             self.sorting_algorithm = SelectionSort()
+        elif self.sort_combo_box.get() == "Bubble Sort":
+            print("bubble")
+            self.sorting_algorithm = BubbleSort()
         else:
             self.sorting_algorithm = BruteForceSort()
 
