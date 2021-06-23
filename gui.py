@@ -1,11 +1,9 @@
-# import tkinter as tk
 import random
 import threading
 import time
-from enum import Enum
-from tkinter import BOTH, Frame, Canvas, Button, ttk, Label, TOP, RIGHT, LEFT
+from tkinter import BOTH, Frame, Canvas, Button, ttk, Label, TOP, LEFT
 from brute_force_sort import BruteForceSort
-from sort import Sort
+from selection_sort import SelectionSort
 
 
 class GUI(Frame):
@@ -13,12 +11,15 @@ class GUI(Frame):
         super().__init__(master)
         self.master = master
         self.pack()
-        self.sorting_algorithm = BruteForceSort
+        self.sorting_algorithm = BruteForceSort()
         self.graph_max_y = 600
         self.graph_max_x = 1000
-        self.sort_methods = ["Brute Force", "Placeholder", "Placeholder"]
-        self.delay = 0.02  # Seconds
-        self.num_of_values = 20
+        self.lower_value_range = 1
+        self.upper_value_range = 100
+
+        self.sort_methods = ["Brute Force", "Selection Sort", "Placeholder"]
+        self.delay = 0.005  # Seconds
+        self.num_of_values = 50
         self.stop_sort = False
 
         self.bar_width = None
@@ -74,12 +75,11 @@ class GUI(Frame):
             threading.Thread(target=self.sort_helper).start()
 
     def sort_helper(self):
-        for iteration in BruteForceSort.sort(self.data_set):
+        for iteration in self.sorting_algorithm.sort(self.data_set):
             if self.stop_sort:
                 self.stop_sort = False
                 break
             if isinstance(iteration, tuple):
-                # self.canvas.delete("all")  # Clears canva
                 self.build_visualizer(iteration)
             else:
                 time.sleep(self.delay)
@@ -92,16 +92,14 @@ class GUI(Frame):
 
     def set_sorting_algorithm(self):
         if self.sort_combo_box.get() == "Brute Force":
-            self.sorting_algorithm = BruteForceSort
+            self.sorting_algorithm = BruteForceSort()
+        elif self.sort_combo_box.get() == "Selection Sort":
+            self.sorting_algorithm = SelectionSort()
         else:
-            self.sorting_algorithm = BruteForceSort
+            self.sorting_algorithm = BruteForceSort()
 
     def build_visualizer(self, index_focus: tuple = None):
-        # value = 1
-        # print((self.graph_max_y / value))
-        # self.canvas.create_rectangle(0, self.graph_max_y - (value * 6), 0 + 25, self.graph_max_y, fill='blue')
         self.bar_width = self.calculate_bar_width()
-        # data_set_copy = self.data_set.copy()
 
         if self.data_set_copy is None:
             # Render whole plot
@@ -114,17 +112,18 @@ class GUI(Frame):
             self.data_set_copy = self.data_set.copy()
         else:
             if index_focus is not None:
-                # Check for evaluation highlight
+                # Render highlighted values in red
                 for element_index in index_focus:
-                    self.canvas.delete(f"rect{element_index}")
-                    self.highlighted_bars.append(element_index)
-                    self.canvas.create_rectangle(element_index * self.bar_width,
-                                                 self.graph_max_y - (self.data_set[element_index] * 6),
-                                                 (element_index * self.bar_width) + self.bar_width, self.graph_max_y,
-                                                 fill='red',
-                                                 tags=f"rect{element_index}")
+                    if element_index not in self.highlighted_bars:
+                        self.canvas.delete(f"rect{element_index}")
+                        self.highlighted_bars.append(element_index)
+                        self.canvas.create_rectangle(element_index * self.bar_width,
+                                                     self.graph_max_y - (self.data_set[element_index] * 6),
+                                                     (element_index * self.bar_width) + self.bar_width, self.graph_max_y,
+                                                     fill='red',
+                                                     tags=f"rect{element_index}")
             else:
-                # Check for swapped bars
+                # Change red highlighted bars to white
                 for index in self.highlighted_bars:
                     self.canvas.delete(f"rect{index}")
                     self.canvas.create_rectangle(index * self.bar_width,
@@ -142,7 +141,7 @@ class GUI(Frame):
         self.data_set.clear()
 
         for value in range(0, self.num_of_values):
-            self.data_set.append(random.randrange(0, 100))
+            self.data_set.append(random.randrange(self.lower_value_range, self.upper_value_range))
         print(self.data_set)
 
     def calculate_bar_width(self):
