@@ -4,10 +4,13 @@ import time
 
 class BruteForceSort(Sort):
 
+    def __init__(self):
+        super(BruteForceSort, self).__init__()
+
     @classmethod
     def sort(cls, arr):
         for i in range(0, len(arr) - 1):
-            for j in range(i, len(arr)):
+            for j in range(i + 1, len(arr)):
                 yield i, j
                 if arr[i] > arr[j]:
                     BruteForceSort.swap(arr, i, j)
