@@ -163,6 +163,7 @@ class GUI(Frame):
 
     def randomize_data(self):
         self.stop_sorting()
+        self.highlighted_bars.clear()
         self.generate_data_set()
         self.data_set_copy = None
         self.canvas.delete("all")  # Clears canvas
