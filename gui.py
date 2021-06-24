@@ -35,6 +35,7 @@ class GUI(Frame):
         self.data_set = []
         self.highlighted_bars = []
         self.data_set_copy = None
+        self.stop_sort_button = None
 
         self.create_widgets()
 
@@ -60,7 +61,7 @@ class GUI(Frame):
                                             command=lambda: self.randomize_data(), padx=5)
         self.randomize_data_button.pack(side=LEFT)
         self.stop_sort_button = Button(self.frame_options, text="Stop Sort", fg="red",
-                                command=lambda: self.stop_sorting())
+                                command=self.stop_sorting)
         self.stop_sort_button.pack(side=LEFT)
 
         # Options End
@@ -72,13 +73,19 @@ class GUI(Frame):
         self.build_visualizer()
 
     def sort(self):
+        print("Sort")
+        if self.stop_sort:
+            self.stop_sorting()
+            self.stop_sort = False
         if self.sort_combo_box.get() in self.sort_methods:
             self.set_sorting_algorithm()
             threading.Thread(target=self.sort_helper).start()
 
+
     def sort_helper(self):
         for iteration in self.sorting_algorithm.sort(self.data_set):
             if self.stop_sort:
+                print("stopping after randomie?")
                 self.stop_sort = False
                 break
             if isinstance(iteration, tuple):
@@ -91,7 +98,7 @@ class GUI(Frame):
 
         self.data_set_copy = None
         self.build_visualizer()
-
+        self.stop_sort = False
 
     def set_sorting_algorithm(self):
         if self.sort_combo_box.get() == "Brute Force":
@@ -162,5 +169,7 @@ class GUI(Frame):
         self.build_visualizer()
 
     def stop_sorting(self):
+
+        print("stop btn")
         self.stop_sort = True
         self.data_set_copy = None
